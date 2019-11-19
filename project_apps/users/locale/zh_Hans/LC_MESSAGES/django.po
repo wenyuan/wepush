@@ -1,0 +1,25 @@
+# ------------------------ model ------------------------
+# Manager model
+msgid "username"
+msgstr "用户名"
+
+msgid "password"
+msgstr "密码"
+
+msgid "email"
+msgstr "电子邮箱"
+
+msgid "description"
+msgstr "描述"
+
+msgid "openids"
+msgstr "用户openids"
+
+msgid "created time"
+msgstr "创建时间"
+
+msgid "updated time"
+msgstr "更新时间"
+
+msgid "manager"
+msgstr "管理员"

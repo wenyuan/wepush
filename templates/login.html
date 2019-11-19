@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}用户登录 - WePush{% endblock %}
+
+{% block extra_css %}
+    <!-- css of 3rd party -->
+    <!-- css of this project -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="line bouncein">
+        <div class="xs6 xm4 xs3-move xm4-move">
+            <div style="height:120px;"></div>
+            <div class="media media-y margin-big-bottom">
+            </div>
+            <form id="login-form">
+                <div class="panel loginbox">
+                    <div class="text-center margin-big padding-big-top">
+                        <h1>WePush管理员登录</h1>
+                    </div>
+                    <div class="panel-body" style="padding:30px; padding-bottom:10px; padding-top:10px;">
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input class="input input-big" id="username" name="username" type="text"
+                                       placeholder="登录账号">
+                                <span class="icon icon-user margin-small"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input class="input input-big" id="password" name="password" type="password"
+                                       placeholder="登录密码">
+                                <span class="icon icon-key margin-small"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="field">
+                                <input class="input input-big" name="captcha_code" type="text" placeholder="填写右侧的验证码">
+                                <input id="captcha-code-value" value="6982" type="hidden">
+                                <img class="captcha" id="captcha" src="/static/img/captcha_code.jpg" alt=""
+                                     width="100" height="32" style="height:43px;cursor:pointer;">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding:30px;">
+                        <input class="button button-block bg-main text-big input-big" id="btn-login" type="button"
+                               value="登录">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- js of 3rd party -->
+    <script src="{% static 'plugins/jquery-validation-1.19.0/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'plugins/jquery-validation-1.19.0/localization/messages_zh.js' %}"></script>
+    <!-- js of this project -->
+    <script type="text/javascript">
+        $(function () {
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    }
+                }
+            });
+
+            let $loginForm = $('#login-form');
+            $loginForm.validate({
+                onkeyup: false,
+                errorPlacement: function (error, element) {
+                    element.parent().parent().append(error);
+                },
+                errorElement: 'label',
+                rules: {
+                    username: {
+                        required: true
+                    },
+                    password: {
+                        required: true
+                    },
+                    captcha_code: {
+                        required: true,
+                        equalTo: '#captcha-code-value'
+                    }
+                },
+                messages: {
+                    username: {
+                        required: '请输入用户名'
+                    },
+                    password: {
+                        required: '请输入密码'
+                    },
+                    captcha_code: {
+                        required: '请输入验证码',
+                        equalTo: '验证码不正确'
+                    }
+                }
+            });
+            $('#btn-login').on('click', function () {
+                let flag = $loginForm.valid();
+                if (!flag) {
+                    return;
+                }
+                let params = {};
+                $loginForm.serializeArray().forEach(function (item) {
+                    params[item.name] = item.value
+                });
+                let next = "{{ request.GET.next }}";
+                params['next'] = next;
+                $.ajax({
+                    type: 'POST',
+                    url: '/users/login/',
+                    data: JSON.stringify(params),
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.code !== 200) {
+                            let loading = layer.load(0)
+                            setTimeout(function () {
+                                layer.close(loading);
+                                let errorMsg = result.msg;
+                                layer.alert(errorMsg, {icon: 2})
+                            }, 500);
+                        } else {
+                            let redirectUrl = result.data['redirect_url']
+                            window.location.href = redirectUrl
+                        }
+                    },
+                    error: function (xhr, ts, e) {
+                    }
+                });
+                return false
+            });
+
+        });
+    </script>
+{% endblock %}

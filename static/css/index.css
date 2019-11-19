@@ -1,0 +1,51 @@
+body {
+    color: #333;
+    font-size: 13px;
+}
+
+header {
+    height: 46px;
+    position: fixed;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    text-align: right;
+}
+
+header a, header a:hover {
+    display: inline-block;
+    margin: 10px 8px;
+    height: 24px;
+    color: #fff;
+    background-color: transparent;
+    border: none;
+    line-height: 24px;
+    font-size: 16px;
+}
+
+header a.active {
+    border-bottom: 1px solid #FFF;
+    padding-bottom: 25px;
+    pointer-events: none;
+}
+
+.panel {
+    background: #fff;
+    text-align: center;
+}
+
+.qrcodebox {
+    background: url('/static/img/login_panel.png');
+    border: 0px;
+}
+
+.tips {
+    padding: 20px;
+    text-align: center;
+}
+
+.operation {
+    width: 100px;
+    display: inline-block;
+    margin-bottom: 20px;
+}

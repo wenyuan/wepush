@@ -1,0 +1,26 @@
+# ------------------------ model ------------------------
+# AccessToken model
+msgid "access_token"
+msgstr "接口调用凭据(access_token)"
+
+msgid "expires_in"
+msgstr "凭证有效时间(expires_in)"
+
+msgid "access token"
+msgstr "微信接口调用凭据"
+
+# Event model
+msgid "related manager"
+msgstr "关联管理员"
+
+msgid "eventkey(scene_id)"
+msgstr "eventkey(场景值ID)"
+
+msgid "ticket"
+msgstr "二维码ticket"
+
+msgid "expired time"
+msgstr "失效时间"
+
+msgid "scan event"
+msgstr "扫描二维码事件"

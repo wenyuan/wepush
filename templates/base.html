@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>{% block title %}用户登录 - WePush{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon"/>
+    <!-- css of 3rd party -->
+    <!-- css of this project -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+<div class="container">
+
+    {% block content %}
+
+    {% endblock %}
+
+</div>
+
+<!-- js of 3rd party -->
+<script src="{% static 'plugins/jquery-3.3.1/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/layer-v3.1.1/layer.js' %}"></script>
+<!-- js of this project -->
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

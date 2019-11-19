@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}接口调试 - WePush{% endblock %}
+
+{% block extra_css %}
+    <!-- css of 3rd party -->
+    <!-- css of this project -->
+    <link rel="stylesheet" href="{% static 'css/debugger.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <header>
+        <a class="btn btn-default btn-flat" href="/index.html">用户绑定</a>
+        <a class="btn btn-default btn-flat active" href="/debugger.html">接口调试</a>
+        <a class="btn btn-default btn-flat" href="/users/logout/">退出</a>
+    </header>
+    <div class="content" style="width: 100%;height: 100%;text-align: center;">
+        <div style="height:40px;"></div>
+        <div class="media media-y margin-big-bottom">
+        </div>
+        <section class="" style="display: inline-block;width: 80%;height:80%;background-color: #FFF">
+            <form id="push-form">
+                <div class="text-center margin-big padding-big-top">
+                    <h1>模板消息推送</h1>
+                </div>
+                <div class="panel-body" style="padding:30px; padding-bottom:10px; padding-top:10px;">
+                    <div class="form-group">
+                        <input class="input input-small" id="manager-guid" name="manager_guid" type="text"
+                               value="{{ request.user.guid }}"
+                               placeholder="管理员GUID">
+                    </div>
+                    <div class="form-group">
+                        <textarea class="req-body" id="req-body" name="req_body" type="textarea" placeholder="模板消息内容">{"url": "", "first": "", "keyword1": "", "keyword2": "", "keyword3":"","remark":""}</textarea>
+                    </div>
+                </div>
+                <div style="text-align: center">
+                    <input class="button bg-main text-small input-small" id="btn-push" type="button"
+                           value="推送消息" style="width: 100px; margin: 0 30px;">
+                    <input class="button bg-main text-small input-small" id="btn-refresh-token" type="button"
+                           value="刷新Token" style="width: 100px; margin: 0 30px;">
+                </div>
+            </form>
+        </section>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- js of 3rd party -->
+    <script src="{% static 'plugins/jquery-validation-1.19.0/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'plugins/jquery-validation-1.19.0/localization/messages_zh.js' %}"></script>
+    <!-- js of this project -->
+    <script src="{% static "js/jquery.validate.extend.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    }
+                }
+            });
+
+            let $pushForm = $('#push-form');
+            $pushForm.validate({
+                onkeyup: false,
+                errorPlacement: function (error, element) {
+                    element.parent().append(error);
+                },
+                errorElement: 'label',
+                rules: {
+                    manager_guid: {
+                        required: true
+                    },
+                    req_body: {
+                        required: true,
+                        isJsonStr: true
+                    }
+                },
+                messages: {
+                    manager_guid: {
+                        required: '请输入管理员GUID'
+                    },
+                    req_body: {
+                        required: '请输入模板消息参数'
+                    }
+                }
+            });
+            $('#btn-push').on('click', function () {
+                let flag = $pushForm.valid();
+                if (!flag) {
+                    return;
+                }
+                let managerGuid = $("#manager-guid").val().trim();
+                let params = JSON.parse($("#req-body").val().trim());
+                $.ajax({
+                    type: 'POST',
+                    url: managerGuid + '.send',
+                    data: JSON.stringify(params),
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.code !== 200) {
+                            let loading = layer.load(0)
+                            setTimeout(function () {
+                                layer.close(loading);
+                                let errorMsg = response.msg;
+                                layer.alert(errorMsg, {icon: 2})
+                            }, 500);
+                        } else {
+                            layer.alert('推送成功，请拿起手机打开微信查看', {icon: 1})
+                        }
+                    },
+                    error: function (xhr, ts, e) {
+                    }
+                });
+                return false
+            });
+
+            $('#btn-refresh-token').on('click', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/refresh_token/',
+                    data: JSON.stringify({}),
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.code !== 200) {
+                            let loading = layer.load(0)
+                            setTimeout(function () {
+                                layer.close(loading);
+                                let errorMsg = response.msg;
+                                layer.alert(errorMsg, {icon: 2})
+                            }, 500);
+                        } else {
+                            layer.alert('刷新Access Token成功', {icon: 1})
+                        }
+                    },
+                    error: function (xhr, ts, e) {
+                    }
+                });
+                return false
+            });
+
+        });
+    </script>
+{% endblock %}
